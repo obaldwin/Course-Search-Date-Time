@@ -1,0 +1,59 @@
+---
+title: "Course Search Wrangling"
+author: "Olivia Baldwin"
+date: "2/15/2019"
+output: html_document
+---
+# Project to execute course search by dates and times
+```{r setup, include = FALSE}
+library(tidyverse)
+library(knitr)
+```
+Here, I am wrangling the data so that I can easily display it as a table and filter for the appropriate dates and times.
+
+```{r wrangling, include = FALSE}
+# read in the data of the dates, times and titles of the courses
+dates_times <- read.csv("data/dates_times.csv")
+
+# select only the course names and times
+dates_times <- dates_times %>%
+  select(course_number, dates_times_title_course_number)
+
+# only select the times
+time <- dates_times %>%
+  head(752)
+
+# only select the course numbers
+course_number <- dates_times %>%
+  tail(752)
+
+# select only the times AGAIN
+time <- time %>%
+  select(dates_times_title_course_number)
+
+# only select the course numbers AGAIN
+course_number <- course_number %>%
+  select(course_number)
+
+# change indices on course number
+rownames(course_number) <- 1:nrow(course_number)
+  
+# create ID column
+id <- rownames(time)
+time <- cbind(id = id, time)
+course_number <- cbind (id = id, course_number)
+
+# merge two data frames to correspond to each other
+new_data <- merge(course_number, time, by = "id")
+
+new_data <- new_data %>%
+  mutate(time = dates_times_title_course_number) %>%
+  select(course_number, time)
+```
+
+Here is the final product:
+```{r table}
+kable(new_data)
+```
+
+
